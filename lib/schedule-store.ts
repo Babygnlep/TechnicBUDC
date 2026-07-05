@@ -1,4 +1,4 @@
-import { promises as fs } from "fs";
+import { promises as fs, constants as fsConstants } from "fs";
 import os from "os";
 import path from "path";
 
@@ -25,18 +25,21 @@ const TEMP_DATA_FILE = path.join(TEMP_DATA_DIR, "schedule.json");
 async function getWritablePath(): Promise<{ dir: string; file: string }> {
   try {
     await fs.mkdir(DEFAULT_DATA_DIR, { recursive: true });
-    await fs.access(DEFAULT_DATA_DIR);
+    await fs.access(DEFAULT_DATA_DIR, fsConstants.W_OK);
+    await fs.writeFile(DATA_FILE, "[]", { flag: "a" });
     return { dir: DEFAULT_DATA_DIR, file: DATA_FILE };
   } catch {
     await fs.mkdir(TEMP_DATA_DIR, { recursive: true });
+    await fs.access(TEMP_DATA_DIR, fsConstants.W_OK);
+    await fs.writeFile(TEMP_DATA_FILE, "[]", { flag: "a" });
     return { dir: TEMP_DATA_DIR, file: TEMP_DATA_FILE };
   }
 }
 
 async function ensureStoreFile(): Promise<void> {
-  const { dir, file } = await getWritablePath();
+  const { file } = await getWritablePath();
   try {
-    await fs.access(file);
+    await fs.access(file, fsConstants.R_OK | fsConstants.W_OK);
   } catch {
     await fs.writeFile(file, "[]", "utf8");
   }
