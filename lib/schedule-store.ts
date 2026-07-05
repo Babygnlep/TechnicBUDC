@@ -26,12 +26,10 @@ async function getWritablePath(): Promise<{ dir: string; file: string }> {
   try {
     await fs.mkdir(DEFAULT_DATA_DIR, { recursive: true });
     await fs.access(DEFAULT_DATA_DIR, fsConstants.W_OK);
-    await fs.writeFile(DATA_FILE, "[]", { flag: "a" });
     return { dir: DEFAULT_DATA_DIR, file: DATA_FILE };
   } catch {
     await fs.mkdir(TEMP_DATA_DIR, { recursive: true });
     await fs.access(TEMP_DATA_DIR, fsConstants.W_OK);
-    await fs.writeFile(TEMP_DATA_FILE, "[]", { flag: "a" });
     return { dir: TEMP_DATA_DIR, file: TEMP_DATA_FILE };
   }
 }
@@ -49,7 +47,13 @@ async function readEntries(): Promise<ScheduleEntry[]> {
   const { file } = await getWritablePath();
   await ensureStoreFile();
   const content = await fs.readFile(file, "utf8");
-  return JSON.parse(content) as ScheduleEntry[];
+
+  try {
+    return JSON.parse(content) as ScheduleEntry[];
+  } catch {
+    await fs.writeFile(file, "[]", "utf8");
+    return [];
+  }
 }
 
 async function writeEntries(entries: ScheduleEntry[]): Promise<void> {
