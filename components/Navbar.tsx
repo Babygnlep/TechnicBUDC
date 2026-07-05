@@ -4,9 +4,10 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const NAV_LINKS = [
-  { label: "หน้าแรก", href: "#home" },
-  { label: "เกี่ยวกับเรา", href: "#about" },
-  { label: "สมัครงาน", href: "#apply" },
+  { label: "หน้าแรก", href: "/" },
+  { label: "เกี่ยวกับเรา", href: "/#about" },
+  { label: "สมัครงาน", href: "/#apply" },
+  { label: "ลงงานวันที่", href: "/schedule" },
 ];
 
 /** Sticky black navbar. Collapses into a hamburger menu on small screens. */

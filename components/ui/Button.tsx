@@ -5,7 +5,7 @@ import Spinner from "./Spinner";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  variant?: "primary" | "dark" | "outline";
+  variant?: "primary" | "dark" | "outline" | "danger";
   size?: "md" | "lg";
   isLoading?: boolean;
 }
@@ -16,6 +16,8 @@ const VARIANT_STYLES: Record<string, string> = {
   dark: "bg-ink text-canvas hover:bg-slate-700 active:scale-[0.98] shadow-soft",
   outline:
     "bg-transparent border-2 border-line text-ink hover:bg-white/10 hover:text-ink shadow-soft",
+  danger:
+    "bg-red-600 text-white hover:bg-red-700 active:scale-[0.98] shadow-soft",
 };
 
 const SIZE_STYLES: Record<string, string> = {

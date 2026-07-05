@@ -10,7 +10,7 @@ export default function About() {
   return (
     <section id="about" className="bg-canvas px-6 py-24 md:py-32">
       <div className="mx-auto max-w-5xl">
-        <div className="max-w-xl">
+        <div className="max-w-2xl rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-[0_20px_80px_-35px_rgba(255,209,0,0.2)] backdrop-blur-xl sm:p-10">
           <h2 className="font-display text-4xl text-ink md:text-5xl">
             เทคนิคคือหน่วยเก็บความทรงจำและทีมงานซัพพอตห้องกล้อง BUDC
           </h2>
@@ -24,7 +24,7 @@ export default function About() {
           {ROLES.map((role) => (
             <div
               key={role.title}
-              className="group rounded-xl2 border border-line bg-white/10 backdrop-blur-xl p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-reel hover:shadow-glow"
+              className="group rounded-[1.5rem] border border-line/70 bg-gradient-to-br from-white/10 to-white/5 p-6 shadow-[0_16px_60px_-28px_rgba(2,6,23,0.8)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-reel/60 hover:shadow-[0_24px_90px_-28px_rgba(255,209,0,0.24)]"
             >
               <h3 className="font-display text-lg text-ink">
                 {role.title}
