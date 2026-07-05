@@ -20,7 +20,15 @@ async function createGoogleCalendarEvent(topic: string, date: string, taskDescri
   const timeZone = process.env.GOOGLE_CALENDAR_TIMEZONE ?? "Asia/Bangkok";
 
   if (!calendarId || !serviceAccountEmail || !privateKey) {
-    return;
+    throw new Error(
+      `Missing Google Calendar config: ${[
+        calendarId ? null : "GOOGLE_CALENDAR_ID",
+        serviceAccountEmail ? null : "GOOGLE_SERVICE_ACCOUNT_EMAIL",
+        privateKey ? null : "GOOGLE_PRIVATE_KEY",
+      ]
+        .filter(Boolean)
+        .join(", ")}`
+    );
   }
 
   const auth = new google.auth.JWT({
@@ -83,7 +91,20 @@ export async function POST(req: Request) {
     }
 
     const entry = await addScheduleEntry(topic, date, taskDescription, note);
-    await createGoogleCalendarEvent(topic, date, taskDescription, note);
+
+    try {
+      await createGoogleCalendarEvent(topic, date, taskDescription, note);
+    } catch (error) {
+      await removeScheduleEntry(entry.id).catch(() => undefined);
+      return NextResponse.json(
+        {
+          success: false,
+          message: `ไม่สามารถส่งข้อมูลไป Google Calendar: ${String(error)}`,
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({ success: true, entry });
   } catch (error) {
     return NextResponse.json(
