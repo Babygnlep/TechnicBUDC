@@ -156,8 +156,8 @@ export default function WorkSchedule() {
   };
 
   return (
-    <section id="schedule" className="bg-canvas px-6 py-24 md:py-32">
-      <div className="mx-auto max-w-5xl rounded-[2.2rem] border border-white/10 bg-[#080d18]/95 p-6 shadow-[0_30px_120px_-45px_rgba(0,0,0,0.65)] backdrop-blur-xl sm:p-10">
+    <section id="schedule" className="bg-canvas px-4 py-24 md:px-6 md:py-32">
+      <div className="mx-auto w-full max-w-5xl rounded-[2.2rem] border border-white/10 bg-[#080d18]/95 p-4 shadow-[0_30px_120px_-45px_rgba(0,0,0,0.65)] backdrop-blur-xl sm:p-6 lg:p-10">
         <div className="mb-10 text-center">
           <p className="mb-3 inline-flex items-center justify-center rounded-full border border-reel/25 bg-reel/10 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.3em] text-[#fff8d3]">
             งานเทคนิค
@@ -208,7 +208,7 @@ export default function WorkSchedule() {
             </form>
           </div>
         ) : (
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="grid gap-8 md:grid-cols-[1.1fr_0.9fr]">
             <div className="rounded-[1.6rem] border border-white/10 bg-[#0a111f]/95 p-6 shadow-[0_18px_60px_-30px_rgba(0,0,0,0.55)]">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -221,6 +221,7 @@ export default function WorkSchedule() {
               </div>
 
               <form onSubmit={handleAddSchedule} className="mt-6 flex flex-col gap-4">
+                {loginError ? <Alert message={loginError} onDismiss={() => setLoginError("")} /> : null}
                 <div className="flex flex-col gap-1.5">
                   <label htmlFor="topic" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                     หัวข้องาน <span className="text-reel">*</span>

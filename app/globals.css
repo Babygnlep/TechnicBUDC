@@ -2,6 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "FC Minimal";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/FC-Minimal/FC Minimal Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "FC Minimal";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/FC-Minimal/FC Minimal Italic.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "FC Minimal";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/FC-Minimal/FC Minimal Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "FC Minimal";
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/FC-Minimal/FC Minimal Bold Italic.ttf") format("truetype");
+}
+
 :root {
   --font-display: "FC Minimal", sans-serif;
   --font-body: "FC Minimal", sans-serif;
@@ -9,11 +41,14 @@
 }
 
 html {
+  font-family: var(--font-body), system-ui, sans-serif;
   scroll-behavior: smooth;
 }
 
 body {
   @apply bg-canvas text-ink font-body antialiased;
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   background:
     radial-gradient(circle at top left, rgba(255, 225, 94, 0.08), transparent 32%),
     linear-gradient(135deg, #020617 0%, #07111f 45%, #020617 100%);
