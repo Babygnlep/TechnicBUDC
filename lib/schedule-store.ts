@@ -1,4 +1,5 @@
 import { promises as fs } from "fs";
+import os from "os";
 import path from "path";
 
 export interface ScheduleEntry {
@@ -16,28 +17,42 @@ export interface ScheduleEntry {
   createdAt: string;
 }
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const DATA_FILE = path.join(DATA_DIR, "schedule.json");
+const DEFAULT_DATA_DIR = path.join(process.cwd(), "data");
+const TEMP_DATA_DIR = path.join(os.tmpdir(), "media-recruit-data");
+const DATA_FILE = path.join(DEFAULT_DATA_DIR, "schedule.json");
+const TEMP_DATA_FILE = path.join(TEMP_DATA_DIR, "schedule.json");
+
+async function getWritablePath(): Promise<{ dir: string; file: string }> {
+  try {
+    await fs.mkdir(DEFAULT_DATA_DIR, { recursive: true });
+    await fs.access(DEFAULT_DATA_DIR);
+    return { dir: DEFAULT_DATA_DIR, file: DATA_FILE };
+  } catch {
+    await fs.mkdir(TEMP_DATA_DIR, { recursive: true });
+    return { dir: TEMP_DATA_DIR, file: TEMP_DATA_FILE };
+  }
+}
 
 async function ensureStoreFile(): Promise<void> {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-
+  const { dir, file } = await getWritablePath();
   try {
-    await fs.access(DATA_FILE);
+    await fs.access(file);
   } catch {
-    await fs.writeFile(DATA_FILE, "[]", "utf8");
+    await fs.writeFile(file, "[]", "utf8");
   }
 }
 
 async function readEntries(): Promise<ScheduleEntry[]> {
+  const { file } = await getWritablePath();
   await ensureStoreFile();
-  const content = await fs.readFile(DATA_FILE, "utf8");
+  const content = await fs.readFile(file, "utf8");
   return JSON.parse(content) as ScheduleEntry[];
 }
 
 async function writeEntries(entries: ScheduleEntry[]): Promise<void> {
+  const { file } = await getWritablePath();
   await ensureStoreFile();
-  await fs.writeFile(DATA_FILE, JSON.stringify(entries, null, 2), "utf8");
+  await fs.writeFile(file, JSON.stringify(entries, null, 2), "utf8");
 }
 
 export async function getScheduleEntries(): Promise<ScheduleEntry[]> {
