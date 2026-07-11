@@ -37,6 +37,12 @@ export function validateField(
       }
       return undefined;
 
+    case "academicYear":
+      if (!trimmed) {
+        return "Please select your academic year.";
+      }
+      return undefined;
+
     case "email":
       if (!BUMAIL_REGEX.test(trimmed)) {
         return "Please enter a valid bumail.net address (e.g. name@bumail.net).";

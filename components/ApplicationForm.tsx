@@ -13,6 +13,7 @@ const INITIAL_DATA: ApplicationFormData = {
   firstName: "",
   lastName: "",
   studentId: "",
+  academicYear: "",
   email: "",
   phone: "",
 };
@@ -152,6 +153,38 @@ export default function ApplicationForm() {
                 autoComplete="off"
               />
             ))}
+
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="academicYear"
+                className="text-xs font-semibold uppercase tracking-wider text-smoke"
+              >
+                ชั้นปี <span className="text-reel">*</span>
+              </label>
+              <select
+                id="academicYear"
+                name="academicYear"
+                value={formData.academicYear}
+                onChange={(e) => handleChange("academicYear", e.target.value)}
+                onBlur={() => handleBlur("academicYear")}
+                disabled={isSubmitting}
+                aria-invalid={!!errors.academicYear}
+                aria-describedby={errors.academicYear ? "academicYear-error" : undefined}
+                className={`w-full rounded-xl border bg-white/10 backdrop-blur-sm px-4 py-3.5 text-ink transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-reel focus:border-reel ${errors.academicYear ? "border-red-500" : "border-line"}`}
+              >
+                <option value="">เลือกชั้นปี</option>
+                <option value="ปี 1">ปี 1</option>
+                <option value="ปี 2">ปี 2</option>
+                <option value="ปี 3">ปี 3</option>
+                <option value="ปี 4">ปี 4</option>
+                <option value="อื่นๆ">อื่นๆ</option>
+              </select>
+              {errors.academicYear && (
+                <p id="academicYear-error" className="text-xs font-medium text-red-500">
+                  {errors.academicYear}
+                </p>
+              )}
+            </div>
           </div>
 
           {status === "error" && (

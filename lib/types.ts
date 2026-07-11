@@ -7,6 +7,7 @@ export interface ApplicationFormData {
   firstName: string;
   lastName: string;
   studentId: string;
+  academicYear: string;
   email: string;
   phone: string;
 }

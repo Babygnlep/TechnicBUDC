@@ -13,6 +13,7 @@ export async function submitApplication(
         firstName: data.firstName.trim(),
         lastName: data.lastName.trim(),
         studentId: data.studentId.trim(),
+        academicYear: data.academicYear.trim(),
         email: data.email.trim(),
         phone: data.phone.trim(),
       }),
