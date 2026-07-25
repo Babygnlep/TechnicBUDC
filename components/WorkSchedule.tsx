@@ -33,7 +33,6 @@ const ROLE_OPTIONS = [
 ];
 
 const DEMO_USERNAME = "technic";
-const DEMO_PASSWORD = "budc2026";
 
 function formatDateLabel(value: string) {
   if (!value) return "";
@@ -44,7 +43,6 @@ function formatDateLabel(value: string) {
 export default function WorkSchedule() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("");
@@ -76,19 +74,18 @@ export default function WorkSchedule() {
 
   const handleLogin = (e: FormEvent) => {
     e.preventDefault();
-    if (username.trim() === DEMO_USERNAME && password === DEMO_PASSWORD) {
+    if (username.trim() === DEMO_USERNAME) {
       setIsAuthenticated(true);
       setLoginError("");
       window.localStorage.setItem("work-schedule-auth", "true");
     } else {
-      setLoginError("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+      setLoginError("ชื่อผู้ใช้ไม่ถูกต้อง");
     }
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUsername("");
-    setPassword("");
     setLoginError("");
     window.localStorage.removeItem("work-schedule-auth");
   };
@@ -174,10 +171,10 @@ export default function WorkSchedule() {
           <div className="mx-auto max-w-xl rounded-[1.6rem] border border-white/10 bg-[#070d1b]/95 p-7 shadow-[0_18px_60px_-30px_rgba(0,0,0,0.5)]">
             <h3 className="text-2xl font-display text-white">เข้าสู่ระบบงานเทคนิค</h3>
             <p className="mt-2 text-sm text-slate-300">
-              ใช้ชื่อผู้ใช้และรหัสผ่าน demo ต่อไปนี้เพื่อเข้าสู่ระบบ
+              ใช้ชื่อผู้ใช้ demo ต่อไปนี้เพื่อเข้าสู่ระบบ
             </p>
             <div className="mt-3 rounded-2xl border border-reel/25 bg-white/5 px-4 py-3 text-sm text-reel">
-              ชื่อผู้ใช้: <span className="font-semibold">{DEMO_USERNAME}</span> / รหัสผ่าน: <span className="font-semibold">{DEMO_PASSWORD}</span>
+              ชื่อผู้ใช้: <span className="font-semibold">{DEMO_USERNAME}</span>
             </div>
 
             <form onSubmit={handleLogin} className="mt-6 flex flex-col gap-4">
@@ -189,15 +186,6 @@ export default function WorkSchedule() {
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="กรอกชื่อผู้ใช้"
                 autoComplete="username"
-              />
-              <Input
-                label="รหัสผ่าน"
-                name="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="กรอกรหัสผ่าน"
-                autoComplete="current-password"
               />
 
               {loginError ? <Alert message={loginError} onDismiss={() => setLoginError("")} /> : null}
