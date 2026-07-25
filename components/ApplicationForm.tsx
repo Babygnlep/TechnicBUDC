@@ -202,6 +202,15 @@ export default function ApplicationForm() {
           >
             ส่งใบสมัคร
           </Button>
+
+          <a
+            href="https://line.me/ti/g/R8rp85Pf6m"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-line bg-white/10 px-10 py-5 text-base font-display tracking-wide uppercase text-ink transition-all duration-300 hover:bg-white/20"
+          >
+            เข้ากลุ่ม LINE TECHNIC BUDC
+          </a>
         </form>
       </div>
 
