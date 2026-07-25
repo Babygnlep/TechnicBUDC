@@ -32,8 +32,6 @@ const ROLE_OPTIONS = [
   { value: "OTHER", label: "อื่นๆ" },
 ];
 
-const DEMO_USERNAME = "technic";
-
 function formatDateLabel(value: string) {
   if (!value) return "";
   const [year, month, day] = value.split("-");
@@ -41,8 +39,6 @@ function formatDateLabel(value: string) {
 }
 
 export default function WorkSchedule() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState("");
   const [loginError, setLoginError] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("");
@@ -52,11 +48,6 @@ export default function WorkSchedule() {
   const [pendingSigners, setPendingSigners] = useState<Record<string, { name: string; role: string; roleOther?: string }>>({});
 
   useEffect(() => {
-    const savedAuth = window.localStorage.getItem("work-schedule-auth");
-    if (savedAuth === "true") {
-      setIsAuthenticated(true);
-    }
-
     void fetchScheduleEntries();
   }, []);
 
@@ -72,23 +63,6 @@ export default function WorkSchedule() {
     }
   };
 
-  const handleLogin = (e: FormEvent) => {
-    e.preventDefault();
-    if (username.trim() === DEMO_USERNAME) {
-      setIsAuthenticated(true);
-      setLoginError("");
-      window.localStorage.setItem("work-schedule-auth", "true");
-    } else {
-      setLoginError("ชื่อผู้ใช้ไม่ถูกต้อง");
-    }
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUsername("");
-    setLoginError("");
-    window.localStorage.removeItem("work-schedule-auth");
-  };
 
   const handleAddSchedule = async (e: FormEvent) => {
     e.preventDefault();
@@ -167,45 +141,13 @@ export default function WorkSchedule() {
           </p>
         </div>
 
-        {!isAuthenticated ? (
-          <div className="mx-auto max-w-xl rounded-[1.6rem] border border-white/10 bg-[#070d1b]/95 p-7 shadow-[0_18px_60px_-30px_rgba(0,0,0,0.5)]">
-            <h3 className="text-2xl font-display text-white">เข้าสู่ระบบงานเทคนิค</h3>
-            <p className="mt-2 text-sm text-slate-300">
-              ใช้ชื่อผู้ใช้ demo ต่อไปนี้เพื่อเข้าสู่ระบบ
-            </p>
-            <div className="mt-3 rounded-2xl border border-reel/25 bg-white/5 px-4 py-3 text-sm text-reel">
-              ชื่อผู้ใช้: <span className="font-semibold">{DEMO_USERNAME}</span>
-            </div>
-
-            <form onSubmit={handleLogin} className="mt-6 flex flex-col gap-4">
-              <Input
-                label="ชื่อผู้ใช้"
-                name="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="กรอกชื่อผู้ใช้"
-                autoComplete="username"
-              />
-
-              {loginError ? <Alert message={loginError} onDismiss={() => setLoginError("")} /> : null}
-
-              <Button type="submit" variant="primary" size="lg">
-                เข้าสู่ระบบ
-              </Button>
-            </form>
-          </div>
-        ) : (
-          <div className="grid gap-8 md:grid-cols-[1.1fr_0.9fr]">
+        <div className="grid gap-8 md:grid-cols-[1.1fr_0.9fr]">
             <div className="rounded-[1.6rem] border border-white/10 bg-[#0a111f]/95 p-6 shadow-[0_18px_60px_-30px_rgba(0,0,0,0.55)]">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-xs uppercase tracking-[0.35em] text-slate-400">ระบบงานเทคนิค</p>
                   <h3 className="mt-2 text-2xl font-display text-white">บันทึกวันที่ที่พร้อมทำงาน</h3>
                 </div>
-                <Button type="button" variant="outline" size="md" onClick={handleLogout}>
-                  ออกจากระบบ
-                </Button>
               </div>
 
               <form onSubmit={handleAddSchedule} className="mt-6 flex flex-col gap-4">
