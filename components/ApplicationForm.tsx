@@ -27,8 +27,8 @@ const FIELD_CONFIG: {
   type: string;
   inputMode?: "text" | "email" | "tel" | "numeric";
 }[] = [
-  { name: "firstName", label: "ชื่อ (กรอกเป็นภาษาไทย)", placeholder: "เทคนิก", type: "text" },
-  { name: "lastName", label: "นามสกุล (กรอกเป็นภาษาไทย)", placeholder: "ปียด์ดี", type: "text" },
+  { name: "firstName", label: "ชื่อ (กรอกเป็นภาษาไทย)", placeholder: "เทคนิค", type: "text" },
+  { name: "lastName", label: "นามสกุล (กรอกเป็นภาษาไทย)", placeholder: "บียูดีซี", type: "text" },
   {
     name: "studentId",
     label: "Student ID",
