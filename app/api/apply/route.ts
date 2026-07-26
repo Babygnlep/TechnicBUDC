@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
+// Web app URL (must be the deployed Exec URL, not the library edit URL)
 const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/library/d/16z2fCd1v2xFZB_dvMQR5hDQsJBsvTrivX97HHxIy_9QRRC2_Ylvjfdak/7";
+  "https://script.google.com/macros/s/AKfycbw_aecArDua321LObYkBEB939Sw79p8AIrGbeohzkKEp3zcPbeF0xUaYkJUQLrHimsT/exec";
 
 export async function POST(req: Request) {
   try {
@@ -25,27 +26,34 @@ export async function POST(req: Request) {
       body: JSON.stringify(data),
     });
 
+    const contentType = response.headers.get("content-type") ?? "";
     const text = await response.text();
 
     console.log("Status:", response.status);
-    console.log("Response:", text);
+    console.log("Response content-type:", contentType);
+    console.log("Response body:", text);
 
-    if (!response.ok) {
+    // If Apps Script returns HTML (e.g., an error page), provide a clearer message
+    if (!response.ok || !contentType.includes("application/json")) {
+      const message = contentType.includes("text/html")
+        ? "Apps Script returned HTML. Check the deployed Exec URL and access permissions."
+        : `Apps Script error ${response.status}: ${text}`;
+
       console.error("Apps Script error:", response.status, text);
       return NextResponse.json(
         {
           success: false,
-          message: `Apps Script error ${response.status}: ${text}`,
+          message,
+          raw: text,
         },
         { status: response.status }
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      status: response.status,
-      response: text,
-    });
+    // JSON response from Apps Script
+    const json = JSON.parse(text || "{}");
+
+    return NextResponse.json({ success: true, status: response.status, response: json });
 
   } catch (error) {
 
