@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import Input from "./ui/Input";
 import Button from "./ui/Button";
 import Modal from "./ui/Modal";
@@ -59,6 +59,21 @@ export default function ApplicationForm() {
   const [status, setStatus] = useState<SubmissionStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const LINE_URL = "https://line.me/ti/g/R8rp85Pf6m";
+
+  useEffect(() => {
+    if (showSuccessModal) {
+      const timer = setTimeout(() => {
+        try {
+          window.open(LINE_URL, "_blank");
+        } catch (_) {
+          // ignore
+        }
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessModal]);
 
   const handleChange = (field: keyof ApplicationFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -224,6 +239,18 @@ export default function ApplicationForm() {
       >
         Thanks for applying — we&apos;ve received your details and our team
         will be in touch soon.
+
+        <div className="mt-6 flex flex-col items-center gap-3">
+          <a
+            href={LINE_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-block rounded-full bg-reel px-6 py-3 text-sm font-semibold text-[#08141d]"
+          >
+            เข้ากลุ่ม LINE TECHNIC BUDC
+          </a>
+          <p className="text-xs text-smoke">ระบบจะเปิด LINE ให้คุณโดยอัตโนมัติ</p>
+        </div>
       </Modal>
     </section>
   );
