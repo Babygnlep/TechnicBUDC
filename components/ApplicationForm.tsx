@@ -2,6 +2,7 @@
 
 import { FormEvent, useState, useEffect } from "react";
 import Input from "./ui/Input";
+import Textarea from "./ui/Textarea";
 import Button from "./ui/Button";
 import Modal from "./ui/Modal";
 import Alert from "./ui/Alert";
@@ -17,7 +18,7 @@ const INITIAL_DATA: ApplicationFormData = {
   email: "",
   phone: "",
   instagram: "",
-
+  comment: "",
 };
 
 const FIELD_CONFIG: {
@@ -203,6 +204,17 @@ export default function ApplicationForm() {
                 </p>
               )}
             </div>
+
+            <Textarea
+              name="comment"
+              label="ทำไมถึงอยากเข้าเทคนิค"
+              placeholder="บอกเหตุผลสั้น ๆ ว่าทำไมคุณอยากเข้า TECHNIC"
+              value={formData.comment}
+              error={errors.comment}
+              disabled={isSubmitting}
+              onChange={(e) => handleChange("comment", e.target.value)}
+              onBlur={() => handleBlur("comment")}
+            />
           </div>
 
           {status === "error" && (

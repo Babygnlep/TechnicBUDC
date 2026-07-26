@@ -11,6 +11,7 @@ export interface ApplicationFormData {
   email: string;
   phone: string;
   instagram: string;
+  comment: string;
 }
 
 /** Per-field validation error messages, keyed by field name. */

@@ -69,6 +69,13 @@ export function validateField(
       return undefined;
     }
 
+    case "comment": {
+      if (trimmed.length < 10) {
+        return "กรุณาอธิบายสั้นๆ ว่าทำไมถึงอยากเข้าเทคนิค";
+      }
+      return undefined;
+    }
+
     default:
       return undefined;
   }

@@ -17,6 +17,7 @@ export async function submitApplication(
         email: data.email.trim(),
         phone: data.phone.trim(),
         instagram: data.instagram.trim(),
+        comment: data.comment.trim(),
       }),
     });
 
