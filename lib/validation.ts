@@ -20,39 +20,39 @@ export function validateField(
   const trimmed = value.trim();
 
   if (!trimmed) {
-    return "This field is required.";
+    return "กรุณากรอกข้อมูลนี้";
   }
 
   switch (field) {
     case "firstName":
     case "lastName":
       if (trimmed.length < 2) {
-        return "Must be at least 2 characters.";
+        return "ต้องมีอย่างน้อย 2 ตัวอักษร";
       }
       return undefined;
 
     case "studentId":
       if (!STUDENT_ID_REGEX.test(trimmed)) {
-        return "Student ID must contain numbers only.";
+        return "รหัสนักศึกษาต้องเป็นตัวเลขเท่านั้น";
       }
       return undefined;
 
     case "academicYear":
       if (!trimmed) {
-        return "Please select your academic year.";
+        return "กรุณาเลือกชั้นปี";
       }
       return undefined;
 
     case "email":
       if (!BUMAIL_REGEX.test(trimmed)) {
-        return "Please enter a valid bumail.net address (e.g. name@bumail.net).";
+        return "กรุณากรอกอีเมล bumail.net ที่ถูกต้อง (เช่น name@bumail.net)";
       }
       return undefined;
 
     case "phone": {
       const digitsOnly = trimmed.replace(/[\s\-()+]/g, "");
       if (!PHONE_DIGITS_REGEX.test(digitsOnly)) {
-        return "Enter a valid phone number (digits only, 9-15 digits).";
+        return "กรุณากรอกหมายเลขโทรศัพท์ที่ถูกต้อง (ตัวเลข 9-15 หลัก)";
       }
       return undefined;
     }
@@ -61,10 +61,10 @@ export function validateField(
       // allow optional leading @, no spaces, reasonable length
       const handle = trimmed.startsWith("@") ? trimmed.slice(1) : trimmed;
       if (handle.length < 2 || handle.length > 30) {
-        return "Enter a valid Instagram handle (2-30 characters).";
+        return "กรุณากรอก Instagram (2-30 ตัวอักษร)";
       }
       if (/\s/.test(handle)) {
-        return "Instagram handle cannot contain spaces.";
+        return "Instagram ห้ามมีช่องว่าง";
       }
       return undefined;
     }

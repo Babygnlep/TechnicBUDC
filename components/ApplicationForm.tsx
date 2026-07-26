@@ -27,8 +27,8 @@ const FIELD_CONFIG: {
   type: string;
   inputMode?: "text" | "email" | "tel" | "numeric";
 }[] = [
-  { name: "firstName", label: "First Name", placeholder: "Alex", type: "text" },
-  { name: "lastName", label: "Last Name", placeholder: "Rivera", type: "text" },
+  { name: "firstName", label: "ชื่อ (กรอกเป็นภาษาไทย)", placeholder: "เทคนิก", type: "text" },
+  { name: "lastName", label: "นามสกุล (กรอกเป็นภาษาไทย)", placeholder: "ปียด์ดี", type: "text" },
   {
     name: "studentId",
     label: "Student ID",
@@ -38,19 +38,19 @@ const FIELD_CONFIG: {
   },
   {
     name: "email",
-    label: "Email (bumail.net)",
-    placeholder: "alex.rivera@bumail.net",
+    label: "อีเมล (bumail.net)",
+    placeholder: "Technic.dc@bumail.net",
     type: "email",
     inputMode: "email",
   },
   {
     name: "phone",
-    label: "Phone Number",
+    label: "เบอร์โทรศัพท์",
     placeholder: "0812345678",
     type: "tel",
     inputMode: "tel",
   },
-  { name: "instagram", label: "Instagram", placeholder: "@yourhandle", type: "text" },
+  { name: "instagram", label: "Instagram", placeholder: "INSTAGRAM", type: "text" },
 ];
 
 export default function ApplicationForm() {
