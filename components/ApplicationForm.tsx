@@ -232,24 +232,28 @@ export default function ApplicationForm() {
         </form>
       </div>
 
-      <Modal
-        isOpen={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
-        title="Application Sent"
-      >
-        Thanks for applying — we&apos;ve received your details and our team
-        will be in touch soon.
+      <Modal isOpen={showSuccessModal} onClose={() => setShowSuccessModal(false)} title="">
+        <div className="flex flex-col items-center gap-4">
+          <svg width="84" height="84" viewBox="0 0 84 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="84" height="84" rx="18" fill="#1B2430" />
+            <circle cx="42" cy="32" r="20" fill="#FEDE59" fillOpacity="0.12" />
+            <path d="M32 36l6 6 14-14" stroke="#FFD400" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
 
-        <div className="mt-6 flex flex-col items-center gap-3">
-          <a
-            href={LINE_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-block rounded-full bg-reel px-6 py-3 text-sm font-semibold text-[#08141d]"
-          >
-            เข้ากลุ่ม LINE TECHNIC BUDC
-          </a>
-          <p className="text-xs text-smoke">ระบบจะเปิด LINE ให้คุณโดยอัตโนมัติ</p>
+          <h3 className="mt-2 text-2xl font-display text-reel">สัมภาษณ์ — เจอกันวันที่ 4 สิงหาคม 2026</h3>
+          <p className="text-center text-sm text-smoke">เวลา 17:00 น. เป็นต้นไป</p>
+
+          <div className="mt-4 flex flex-col items-center gap-3">
+            <a
+              href={LINE_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-block rounded-full bg-reel px-6 py-3 text-sm font-semibold text-[#08141d]"
+            >
+              เข้ากลุ่ม LINE TECHNIC BUDC
+            </a>
+            <p className="text-xs text-smoke">ระบบจะเปิด LINE ให้คุณโดยอัตโนมัติ</p>
+          </div>
         </div>
       </Modal>
     </section>
