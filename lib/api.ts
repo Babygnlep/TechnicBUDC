@@ -16,6 +16,7 @@ export async function submitApplication(
         academicYear: data.academicYear.trim(),
         email: data.email.trim(),
         phone: data.phone.trim(),
+        instagram: data.instagram.trim(),
       }),
     });
 

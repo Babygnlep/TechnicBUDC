@@ -10,6 +10,7 @@ export interface ApplicationFormData {
   academicYear: string;
   email: string;
   phone: string;
+  instagram: string;
 }
 
 /** Per-field validation error messages, keyed by field name. */

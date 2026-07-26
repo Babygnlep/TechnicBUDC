@@ -57,6 +57,18 @@ export function validateField(
       return undefined;
     }
 
+    case "instagram": {
+      // allow optional leading @, no spaces, reasonable length
+      const handle = trimmed.startsWith("@") ? trimmed.slice(1) : trimmed;
+      if (handle.length < 2 || handle.length > 30) {
+        return "Enter a valid Instagram handle (2-30 characters).";
+      }
+      if (/\s/.test(handle)) {
+        return "Instagram handle cannot contain spaces.";
+      }
+      return undefined;
+    }
+
     default:
       return undefined;
   }

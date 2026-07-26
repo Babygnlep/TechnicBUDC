@@ -16,6 +16,8 @@ const INITIAL_DATA: ApplicationFormData = {
   academicYear: "",
   email: "",
   phone: "",
+  instagram: "",
+
 };
 
 const FIELD_CONFIG: {
@@ -48,6 +50,7 @@ const FIELD_CONFIG: {
     type: "tel",
     inputMode: "tel",
   },
+  { name: "instagram", label: "Instagram", placeholder: "@yourhandle", type: "text" },
 ];
 
 export default function ApplicationForm() {
