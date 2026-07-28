@@ -19,7 +19,7 @@ export function validateField(
 ): string | undefined {
   const trimmed = value.trim();
 
-  if (!trimmed) {
+  if (!trimmed && field !== "comment") {
     return "กรุณากรอกข้อมูลนี้";
   }
 
@@ -70,6 +70,9 @@ export function validateField(
     }
 
     case "comment": {
+      if (!trimmed) {
+        return undefined;
+      }
       if (trimmed.length < 10) {
         return "กรุณาอธิบายสั้นๆ ว่าทำไมถึงอยากเข้าเทคนิค";
       }

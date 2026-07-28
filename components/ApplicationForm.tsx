@@ -211,6 +211,7 @@ export default function ApplicationForm() {
               placeholder="บอกเหตุผลสั้น ๆ ว่าทำไมคุณอยากเข้า TECHNIC"
               value={formData.comment}
               error={errors.comment}
+              required={false}
               disabled={isSubmitting}
               onChange={(e) => handleChange("comment", e.target.value)}
               onBlur={() => handleBlur("comment")}
