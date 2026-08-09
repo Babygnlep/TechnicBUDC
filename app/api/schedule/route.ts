@@ -1,53 +1,7 @@
 import { NextResponse } from "next/server";
-import { google } from "googleapis";
 import { addScheduleEntry, getScheduleEntries, removeScheduleEntry, removeScheduleSigner, signScheduleEntry } from "@/lib/schedule-store";
+import { createGoogleCalendarEvent } from "@/lib/google-calendar";
 
-function normalizePrivateKey(key: string) {
-  return key.replace(/\\n/g, "\n");
-}
-
-function getNextDayDate(date: string) {
-  const [year, month, day] = date.split("-").map(Number);
-  const nextDay = new Date(year, month - 1, day + 1);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${nextDay.getFullYear()}-${pad(nextDay.getMonth() + 1)}-${pad(nextDay.getDate())}`;
-}
-
-async function createGoogleCalendarEvent(topic: string, date: string, taskDescription: string, note: string) {
-  const calendarId = process.env.GOOGLE_CALENDAR_ID;
-  const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY;
-  const timeZone = process.env.GOOGLE_CALENDAR_TIMEZONE ?? "Asia/Bangkok";
-
-  if (!calendarId || !serviceAccountEmail || !privateKey) {
-    throw new Error(
-      `Missing Google Calendar config: ${[
-        calendarId ? null : "GOOGLE_CALENDAR_ID",
-        serviceAccountEmail ? null : "GOOGLE_SERVICE_ACCOUNT_EMAIL",
-        privateKey ? null : "GOOGLE_PRIVATE_KEY",
-      ]
-        .filter(Boolean)
-        .join(", ")}`
-    );
-  }
-
-  const auth = new google.auth.JWT({
-    email: serviceAccountEmail,
-    key: normalizePrivateKey(privateKey),
-    scopes: ["https://www.googleapis.com/auth/calendar"],
-  });
-
-  const calendar = google.calendar({ version: "v3", auth });
-  await calendar.events.insert({
-    calendarId,
-    requestBody: {
-      summary: `${topic} - ${taskDescription}`,
-      description: `หัวข้องาน: ${topic}\nงาน: ${taskDescription}${note ? `\nหมายเหตุ: ${note}` : ""}`,
-      start: { date, timeZone },
-      end: { date: getNextDayDate(date), timeZone },
-    },
-  });
-}
 
 export async function GET() {
   try {
@@ -92,20 +46,27 @@ export async function POST(req: Request) {
 
     const entry = await addScheduleEntry(topic, date, taskDescription, note);
 
-    try {
-      await createGoogleCalendarEvent(topic, date, taskDescription, note);
-    } catch (error) {
-      await removeScheduleEntry(entry.id).catch(() => undefined);
-      return NextResponse.json(
-        {
-          success: false,
-          message: `ไม่สามารถส่งข้อมูลไป Google Calendar: ${String(error)}`,
-        },
-        { status: 500 }
-      );
+    // Allow opting out of Google Calendar integration via env var.
+    // Set DISABLE_GOOGLE_CALENDAR=true to skip creating Google events.
+    const disableGoogle = String(process.env.DISABLE_GOOGLE_CALENDAR || "").toLowerCase() === "true";
+    if (!disableGoogle) {
+      try {
+        await createGoogleCalendarEvent(topic, date, taskDescription, note);
+      } catch (error) {
+        // If calendar creation fails, remove the saved entry to keep behavior
+        // compatible with previous implementation and return an error.
+        await removeScheduleEntry(entry.id).catch(() => undefined);
+        return NextResponse.json(
+          {
+            success: false,
+            message: `ไม่สามารถส่งข้อมูลไป Google Calendar: ${String(error)}`,
+          },
+          { status: 500 }
+        );
+      }
     }
 
-    return NextResponse.json({ success: true, entry });
+    return NextResponse.json({ success: true, entry, googleSyncSkipped: disableGoogle });
   } catch (error) {
     return NextResponse.json(
       { success: false, message: String(error) },

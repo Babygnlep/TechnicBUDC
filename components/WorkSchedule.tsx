@@ -6,6 +6,7 @@ import Button from "./ui/Button";
 import Alert from "./ui/Alert";
 import WorkScheduleForm from "./WorkScheduleForm";
 import WorkScheduleList from "./WorkScheduleList";
+import CalendarView from "./CalendarView";
 
 interface ScheduleEntry {
   id: string;
@@ -422,6 +423,10 @@ export default function WorkSchedule() {
                   ))}
               </div>
             </div>
+          </div>
+
+          <div className="mt-8">
+            <CalendarView entries={scheduleEntries} />
           </div>
       </div>
     </section>
