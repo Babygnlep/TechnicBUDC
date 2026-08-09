@@ -148,7 +148,7 @@ export function CalendarView({ events, onCreate, onUpdate, onExport }: Props) {
             eventDrop={handleEventDrop as never}
             eventResize={handleEventResize as never}
             headerToolbar={{ left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' }}
-            viewDidMount={(arg) => setView(arg.view.type as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay')}
+            viewDidMount={(arg: any) => setView(arg.view.type as 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay')}
           />
         </div>
 

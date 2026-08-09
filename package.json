@@ -9,20 +9,25 @@
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace server\" \"npm run dev --workspace client\"",
     "build": "npm run build --workspace client",
+    "vercel-build": "next build",
     "start": "npm run start --workspace server",
     "lint": "echo 'No root lint configured'"
   },
   "dependencies": {
+    "@fullcalendar/daygrid": "^6.1.21",
+    "@fullcalendar/interaction": "^6.1.21",
+    "@fullcalendar/react": "^7.0.2",
     "concurrently": "^9.1.0",
     "googleapis": "^173.0.0",
     "next": "^15.1.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "recharts": "^3.10.1"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.1",
     "eslint-config-next": "^15.1.0",
