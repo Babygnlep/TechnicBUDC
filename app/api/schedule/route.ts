@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { addScheduleEntry, getScheduleEntries, removeScheduleEntry, removeScheduleSigner, signScheduleEntry } from "@/lib/schedule-store";
-import { createGoogleCalendarEvent } from "@/lib/google-calendar";
+import { createGoogleCalendarEvent, isGoogleCalendarConfigured } from "@/lib/google-calendar";
 
 
 export async function GET() {
@@ -46,15 +46,14 @@ export async function POST(req: Request) {
 
     const entry = await addScheduleEntry(topic, date, taskDescription, note);
 
-    // Allow opting out of Google Calendar integration via env var.
-    // Set DISABLE_GOOGLE_CALENDAR=true to skip creating Google events.
     const disableGoogle = String(process.env.DISABLE_GOOGLE_CALENDAR || "").toLowerCase() === "true";
-    if (!disableGoogle) {
+    const googleConfigured = isGoogleCalendarConfigured();
+    const googleSyncSkipped = disableGoogle || !googleConfigured;
+
+    if (!googleSyncSkipped) {
       try {
         await createGoogleCalendarEvent(topic, date, taskDescription, note);
       } catch (error) {
-        // If calendar creation fails, remove the saved entry to keep behavior
-        // compatible with previous implementation and return an error.
         await removeScheduleEntry(entry.id).catch(() => undefined);
         return NextResponse.json(
           {
@@ -66,7 +65,7 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, entry, googleSyncSkipped: disableGoogle });
+    return NextResponse.json({ success: true, entry, googleSyncSkipped });
   } catch (error) {
     return NextResponse.json(
       { success: false, message: String(error) },

@@ -1,5 +1,13 @@
 import { google } from "googleapis";
 
+export function isGoogleCalendarConfigured() {
+  return Boolean(
+    process.env.GOOGLE_CALENDAR_ID &&
+    process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL &&
+    process.env.GOOGLE_PRIVATE_KEY
+  );
+}
+
 function normalizePrivateKey(key: string) {
   return key.replace(/\\n/g, "\n");
 }
