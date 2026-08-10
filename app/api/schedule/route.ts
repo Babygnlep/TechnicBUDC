@@ -27,6 +27,30 @@ function requireScheduleAuthentication(request: Request, requiredRole?: "admin")
 
 
 export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const isPreviewRequest = searchParams.get("preview") === "1";
+
+  if (isPreviewRequest) {
+    try {
+      const entries = await getScheduleEntries();
+      return NextResponse.json({
+        success: true,
+        entries: entries.map(({ id, topic, date, taskDescription, note }) => ({
+          id,
+          topic,
+          date,
+          taskDescription,
+          note,
+        })),
+      });
+    } catch (error) {
+      return NextResponse.json(
+        { success: false, message: String(error) },
+        { status: 500 }
+      );
+    }
+  }
+
   const unauthorized = requireScheduleAuthentication(req);
   if (unauthorized) return unauthorized;
 
