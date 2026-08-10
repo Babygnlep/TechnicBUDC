@@ -192,11 +192,14 @@ export default function WorkSchedule() {
   );
 
   return (
-    <section id="schedule" className="bg-canvas px-3 py-20 sm:px-4 sm:py-24 md:px-6 md:py-32">
-      <div className="mx-auto w-full max-w-5xl rounded-[2.2rem] border border-white/10 bg-[#080d18]/95 p-4 shadow-[0_30px_120px_-45px_rgba(0,0,0,0.65)] backdrop-blur-xl sm:p-6 lg:p-10">
-        <div className="mb-10 text-center">
-          <div className="mb-5 flex justify-end">
-            <span className="mr-3 rounded-full border border-reel/30 bg-reel/10 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-reel">
+    <section id="schedule" className="relative overflow-hidden bg-canvas px-3 py-20 sm:px-4 sm:py-24 md:px-6 md:py-32">
+      <div className="pointer-events-none absolute left-1/2 top-0 h-[30rem] w-[48rem] -translate-x-1/2 rounded-full bg-reel/[0.05] blur-3xl" />
+      <div className="relative mx-auto w-full max-w-6xl rounded-[2.2rem] border border-white/10 bg-[#080d18]/90 p-4 shadow-[0_30px_120px_-45px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:p-6 lg:p-10">
+        <div className="mb-10 border-b border-white/10 pb-8 text-center">
+          <div className="mb-8 flex items-center justify-between">
+            <span className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Schedule workspace</span>
+            <div className="flex items-center gap-2">
+            <span className="rounded-full border border-reel/30 bg-reel/10 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-reel">
               {role === "admin" ? "Admin" : "User"}
             </span>
             <button
@@ -206,11 +209,12 @@ export default function WorkSchedule() {
             >
               ออกจากระบบ
             </button>
+            </div>
           </div>
-          <p className="mb-3 inline-flex items-center justify-center rounded-full border border-reel/25 bg-reel/10 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.3em] text-[#fff8d3]">
-            งานเทคนิค
+          <p className="mb-4 inline-flex items-center justify-center gap-2 rounded-full border border-reel/25 bg-reel/10 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.3em] text-[#fff8d3]">
+            <span className="h-1.5 w-1.5 rounded-full bg-reel shadow-[0_0_14px_rgba(255,225,94,0.9)]" /> งานเทคนิค
           </p>
-          <h2 className="font-display text-3xl leading-tight text-white sm:text-4xl md:text-5xl">
+          <h2 className="font-display text-4xl leading-tight text-white sm:text-5xl md:text-6xl">
             ลงงานวันที่ในระบบงานเทคนิค
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-300 md:text-base">

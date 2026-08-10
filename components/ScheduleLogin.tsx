@@ -92,38 +92,51 @@ export default function ScheduleLogin({ onAuthenticated }: ScheduleLoginProps) {
   };
 
   return (
-    <div className="mx-auto w-full max-w-md rounded-[2rem] border border-white/10 bg-[#0a111f]/95 p-5 shadow-[0_30px_120px_-45px_rgba(0,0,0,0.65)] sm:p-8">
-      <p className="text-xs uppercase tracking-[0.35em] text-slate-400">ระบบงานเทคนิค</p>
-      <h2 className="mt-2 text-3xl font-display text-white">เข้าสู่ระบบลงงาน</h2>
-      <p className="mt-3 text-sm text-slate-300">กรอกรหัสผ่านของทีมเพื่อดูและบันทึกวันลงงาน</p>
-
-      <div className="mt-6 rounded-2xl border border-white/10 bg-[#081222]/90 p-4">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">ตัวอย่างงานที่กำลังจะมาถึง</p>
-          <span className="rounded-full bg-reel/10 px-3 py-1 text-xs text-reel">{upcomingPreviewEntries.length} งาน</span>
-        </div>
-        {previewError ? (
-          <p className="mt-3 text-sm text-slate-400">{previewError}</p>
-        ) : upcomingPreviewEntries.length === 0 ? (
-          <p className="mt-3 text-sm text-slate-400">ยังไม่มีงานที่ลงไว้</p>
-        ) : (
-          <div className="mt-3 space-y-2">
-            {upcomingPreviewEntries.map((entry) => (
-              <div key={entry.id} className="rounded-xl border border-white/10 bg-slate-950/80 p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-white">{formatDateLabel(entry.date)} · {entry.topic}</p>
-                    <p className="mt-1 text-sm text-slate-300">{entry.taskDescription}</p>
-                  </div>
-                  <span className="shrink-0 rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-reel">{formatCountdown(entry.date)}</span>
-                </div>
-              </div>
-            ))}
+    <div className="relative mx-auto w-full max-w-4xl overflow-hidden rounded-[2rem] border border-white/10 bg-[#09111e]/95 shadow-[0_35px_120px_-42px_rgba(0,0,0,0.9)]">
+      <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-reel/10 blur-3xl" />
+      <div className="relative grid lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="border-b border-white/10 p-6 sm:p-9 lg:border-b-0 lg:border-r">
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-reel/30 bg-reel/10 text-lg text-reel">✦</span>
+            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">Technic BUDC</p>
           </div>
-        )}
-      </div>
+          <h2 className="mt-8 text-4xl font-display leading-none text-white sm:text-5xl">ตารางงาน<br /><span className="text-reel">ที่กำลังจะมาถึง</span></h2>
+          <p className="mt-5 max-w-md text-sm leading-relaxed text-slate-300">เช็กวันงานและเตรียมตัวก่อนเข้าสู่ระบบจัดการตารางของทีม</p>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <div className="mt-8 rounded-[1.35rem] border border-white/10 bg-[#050b14]/75 p-4 sm:p-5">
+            <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">Upcoming work</p>
+              <span className="rounded-full border border-reel/20 bg-reel/10 px-3 py-1 text-xs font-semibold text-reel">{upcomingPreviewEntries.length} งาน</span>
+            </div>
+            {previewError ? (
+              <p className="mt-4 text-sm text-slate-400">{previewError}</p>
+            ) : upcomingPreviewEntries.length === 0 ? (
+              <p className="mt-4 text-sm text-slate-400">ยังไม่มีงานที่ลงไว้</p>
+            ) : (
+              <div className="mt-2 divide-y divide-white/10">
+                {upcomingPreviewEntries.map((entry) => (
+                  <div key={entry.id} className="group flex items-center gap-3 py-3.5">
+                    <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl border border-white/10 bg-white/5 text-center">
+                      <span className="text-sm font-semibold leading-none text-white">{entry.date.slice(8, 10)}</span>
+                      <span className="mt-1 text-[9px] uppercase tracking-wider text-slate-500">{entry.date.slice(5, 7)}</span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-white">{entry.taskDescription}</p>
+                      <p className="mt-0.5 text-xs tracking-wide text-slate-400">{entry.topic} · {formatDateLabel(entry.date)}</p>
+                    </div>
+                    <span className="shrink-0 text-xs font-medium text-reel">{formatCountdown(entry.date)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-col justify-center p-6 sm:p-9">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-reel">Member access</p>
+          <h3 className="mt-3 text-3xl font-display text-white">เข้าสู่ระบบ</h3>
+          <p className="mt-2 text-sm text-slate-400">ใช้รหัสผ่านของทีมเพื่อจัดการหรือเลือกตำแหน่งงาน</p>
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400" htmlFor="schedule-password">
           รหัสผ่าน
           <input
@@ -133,14 +146,18 @@ export default function ScheduleLogin({ onAuthenticated }: ScheduleLoginProps) {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             required
-            className="w-full rounded-xl border border-white/10 bg-slate-950/90 px-4 py-3.5 text-base normal-case tracking-normal text-white focus:outline-none focus:ring-2 focus:ring-reel focus:border-reel"
+            placeholder="กรอกรหัสผ่านของคุณ"
+            className="w-full rounded-xl border border-white/10 bg-[#050b14] px-4 py-3.5 text-base normal-case tracking-normal text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-reel focus:border-reel"
           />
         </label>
         {error ? <Alert message={error} onDismiss={() => setError("")} /> : null}
         <Button type="submit" variant="primary" size="lg" className="w-full" isLoading={isSubmitting}>
-          เข้าสู่ระบบ
+          เข้าสู่ระบบเพื่อดูตาราง
         </Button>
       </form>
+          <p className="mt-5 text-center text-xs text-slate-500">เฉพาะสมาชิกทีม TECHNIC BUDC</p>
+        </div>
+      </div>
     </div>
   );
 }
