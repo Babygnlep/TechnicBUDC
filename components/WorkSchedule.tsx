@@ -26,6 +26,23 @@ const TOPIC_OPTIONS = [
   { value: "CAMERASTORE", label: "CAMERASTORE" },
 ];
 
+const ROLE_OPTIONS = [
+  "PHOTO",
+  "VIDEO",
+  "POSTPHOTO",
+  "POSTVIDEO",
+  "RUNNER",
+  "LIGHT",
+  "PRODUCER",
+  "HEAD PHOTO",
+  "HEAD VIDEO",
+  "HEAD POSTPHOTO",
+  "HEAD POSTVIDEO",
+  "HEAD RUNNER",
+  "HEAD LIGHT",
+  "HEAD PRODUCER",
+];
+
 function formatDateLabel(value: string) {
   if (!value) return "";
   const [year, month, day] = value.split("-");
@@ -174,30 +191,6 @@ export default function WorkSchedule() {
     new Set(scheduleEntries.flatMap((entry) => (entry.signers ?? []).map((signer) => signer.name.trim())).filter(Boolean))
   );
 
-  if (!isAdmin) {
-    return (
-      <section id="schedule" className="bg-canvas px-3 py-20 sm:px-4 sm:py-24 md:px-6 md:py-32">
-        <div className="mx-auto w-full max-w-5xl rounded-[2.2rem] border border-white/10 bg-[#080d18]/95 p-4 shadow-[0_30px_120px_-45px_rgba(0,0,0,0.65)] backdrop-blur-xl sm:p-6 lg:p-10">
-          <div className="mb-8 flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.35em] text-slate-400">ตารางงานเทคนิค</p>
-              <h2 className="mt-2 font-display text-3xl text-white sm:text-4xl">วันและเวลาที่งานพร้อม</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-300">เลือกวันที่ในปฏิทินเพื่อดูรายละเอียดงานที่พร้อมลงงาน</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => void handleLogout()}
-              className="shrink-0 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/10"
-            >
-              ออกจากระบบ
-            </button>
-          </div>
-          <CalendarView entries={scheduleEntries} />
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section id="schedule" className="bg-canvas px-3 py-20 sm:px-4 sm:py-24 md:px-6 md:py-32">
       <div className="mx-auto w-full max-w-5xl rounded-[2.2rem] border border-white/10 bg-[#080d18]/95 p-4 shadow-[0_30px_120px_-45px_rgba(0,0,0,0.65)] backdrop-blur-xl sm:p-6 lg:p-10">
@@ -328,7 +321,7 @@ export default function WorkSchedule() {
                           <p className="mt-2 break-words text-sm text-slate-200">
                             <span className="font-semibold">งานที่ทำ:</span> {entry.taskDescription}
                           </p>
-                          {isAdmin && (entry.signers && entry.signers.length > 0 ? (
+                          {entry.signers && entry.signers.length > 0 ? (
                             <div className="mt-3 space-y-4 rounded-2xl border border-white/10 bg-white/5 p-3">
                               <p className="text-sm text-slate-300">
                                 <span className="font-semibold text-reel">รายชื่อผู้ลงชื่อ</span>
@@ -346,15 +339,16 @@ export default function WorkSchedule() {
                                     {signers.map((signer) => (
                                       <div key={signer.signedAt} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-[#0f1725] px-3 py-2">
                                         <p className="text-sm text-slate-300">{signer.name}</p>
-                                        {editingSignerRoles[`${entry.id}:${signer.signedAt}`] !== undefined ? (
+                                        {isAdmin && editingSignerRoles[`${entry.id}:${signer.signedAt}`] !== undefined ? (
                                           <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
-                                            <input
-                                              type="text"
+                                            <select
                                               value={editingSignerRoles[`${entry.id}:${signer.signedAt}`]}
                                               onChange={(event) => setEditingSignerRoles((prev) => ({ ...prev, [`${entry.id}:${signer.signedAt}`]: event.target.value }))}
                                               aria-label={`ตำแหน่งของ ${signer.name}`}
                                               className="min-w-0 flex-1 rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white sm:w-40"
-                                            />
+                                            >
+                                              {ROLE_OPTIONS.map((roleOption) => <option key={roleOption} value={roleOption} className="text-slate-900">{roleOption}</option>)}
+                                            </select>
                                             <button
                                               type="button"
                                               onClick={async () => {
@@ -386,7 +380,7 @@ export default function WorkSchedule() {
                                             >บันทึก</button>
                                             <button type="button" onClick={() => setEditingSignerRoles((prev) => { const next = { ...prev }; delete next[`${entry.id}:${signer.signedAt}`]; return next; })} className="text-xs text-slate-300">ยกเลิก</button>
                                           </div>
-                                        ) : (
+                                        ) : isAdmin ? (
                                           <div className="flex items-center gap-2">
                                             <button type="button" onClick={() => setEditingSignerRoles((prev) => ({ ...prev, [`${entry.id}:${signer.signedAt}`]: signerRole }))} className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-200 transition hover:bg-white/10">แก้ไขตำแหน่ง</button>
                                             <button
@@ -408,6 +402,8 @@ export default function WorkSchedule() {
                                               className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-200 transition hover:bg-red-500 hover:text-white"
                                             >ลบ</button>
                                           </div>
+                                        ) : (
+                                          <span className="text-sm text-slate-400">{signerRole}</span>
                                         )}
                                       </div>
                                     ))}
@@ -421,7 +417,7 @@ export default function WorkSchedule() {
                                 <span className="font-semibold text-reel">ยังไม่มีชื่อทีมงานลงทะเบียน</span>
                               </p>
                             </div>
-                          ))}
+                          )}
                           <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-3">
                             <p className="text-sm text-slate-300">
                               <span className="font-semibold">{isAdmin ? "กำหนดผู้รับผิดชอบ" : "กรอกชื่อและตำแหน่งของคุณ"}</span>
@@ -446,8 +442,7 @@ export default function WorkSchedule() {
                               <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                                 ตำแหน่ง
                               </label>
-                              <input
-                                type="text"
+                              <select
                                 value={pendingSigners[entry.id]?.role ?? ""}
                                 onChange={(e) =>
                                   setPendingSigners((prev) => ({
@@ -458,9 +453,11 @@ export default function WorkSchedule() {
                                     },
                                   }))
                                 }
-                                placeholder="เช่น VIDEO, PHOTO, จัดไฟ"
                                 className="w-full rounded-xl border border-white/10 bg-slate-950/90 px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-reel focus:border-reel"
-                              />
+                              >
+                                <option value="" className="text-slate-500">เลือกตำแหน่ง</option>
+                                {ROLE_OPTIONS.map((roleOption) => <option key={roleOption} value={roleOption} className="text-slate-900">{roleOption}</option>)}
+                              </select>
                             </div>
                             <button
                               type="button"
@@ -527,9 +524,9 @@ export default function WorkSchedule() {
             </datalist>
           ) : null}
 
-          {isAdmin ? <div className="mt-8">
+          <div className="mt-8">
             <CalendarView entries={scheduleEntries} />
-          </div> : null}
+          </div>
       </div>
     </section>
   );
