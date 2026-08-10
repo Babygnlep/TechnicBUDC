@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { addAttendanceMember, getAttendance, setAttendance, type AttendanceStatus } from "@/lib/attendance-store";
+import { addAttendanceMember, getAttendance, seedPdfRoster, setAttendance, type AttendanceStatus } from "@/lib/attendance-store";
 import { getScheduleRoleFromSession, getScheduleSessionFromRequest } from "@/lib/schedule-auth";
 
 function roleFor(request: Request) {
@@ -16,6 +16,7 @@ export async function GET(request: Request) {
   if (!roleFor(request)) return NextResponse.json({ success: false, message: "กรุณาเข้าสู่ระบบก่อนใช้งาน" }, { status: 401 });
   try {
     const date = new URL(request.url).searchParams.get("date") || today();
+    await seedPdfRoster();
     const members = await getAttendance(date);
     return NextResponse.json({ success: true, date, members });
   } catch (error) {
@@ -26,9 +27,9 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   if (roleFor(request) !== "admin") return NextResponse.json({ success: false, message: "เฉพาะ Admin เท่านั้น" }, { status: 403 });
   try {
-    const { name } = await request.json();
+    const { name, cohort } = await request.json();
     if (typeof name !== "string" || !name.trim()) return NextResponse.json({ success: false, message: "กรุณากรอกชื่อ" }, { status: 400 });
-    await addAttendanceMember(name);
+    await addAttendanceMember(name, typeof cohort === "string" ? cohort : undefined);
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ success: false, message: String(error) }, { status: 500 });

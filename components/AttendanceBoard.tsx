@@ -7,7 +7,7 @@ import ScheduleLogin from "./ScheduleLogin";
 
 type Role = "admin" | "user";
 type Status = "present" | "absent" | "leave";
-interface Member { id: string; name: string; status: Status | null; leaveReason: string }
+interface Member { id: string; name: string; cohort: string; status: Status | null; leaveReason: string }
 
 const STATUS: Record<Status, { label: string; active: string }> = {
   present: { label: "มา", active: "border-emerald-400/50 bg-emerald-400/15 text-emerald-200" },
@@ -23,6 +23,7 @@ export default function AttendanceBoard() {
   const [members, setMembers] = useState<Member[]>([]);
   const [date, setDate] = useState(localDate());
   const [name, setName] = useState("");
+  const [cohort, setCohort] = useState("20");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -68,7 +69,7 @@ export default function AttendanceBoard() {
     event.preventDefault();
     if (!name.trim()) return;
     try {
-      const response = await fetch("/api/attendance", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
+      const response = await fetch("/api/attendance", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, cohort }) });
       const data = await response.json();
       if (!response.ok || !data?.success) throw new Error(data?.message || "เพิ่มชื่อไม่สำเร็จ");
       setName(""); await load();
@@ -86,10 +87,10 @@ export default function AttendanceBoard() {
     <div className="mt-6 grid gap-3 sm:grid-cols-3">
       {(["present", "absent", "leave"] as Status[]).map((status) => <div key={status} className={`rounded-2xl border p-4 ${STATUS[status].active}`}><p className="text-xs uppercase tracking-[.2em] opacity-75">{STATUS[status].label}</p><p className="mt-1 text-3xl font-display">{totals[status]}</p></div>)}
     </div>
-    {role === "admin" && <form onSubmit={addMember} className="mt-6 flex gap-3 rounded-2xl border border-white/10 bg-white/5 p-3"><input value={name} onChange={(event) => setName(event.target.value)} placeholder="เพิ่มชื่อสมาชิก" className="min-w-0 flex-1 bg-transparent px-3 text-white placeholder:text-slate-500 outline-none" /><Button type="submit" size="md">เพิ่มชื่อ</Button></form>}
+    {role === "admin" && <form onSubmit={addMember} className="mt-6 flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 sm:flex-row"><input value={name} onChange={(event) => setName(event.target.value)} placeholder="เพิ่มชื่อสมาชิก" className="min-w-0 flex-1 bg-transparent px-3 text-white placeholder:text-slate-500 outline-none" /><select value={cohort} onChange={(event) => setCohort(event.target.value)} className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white"><option value="20">รุ่น 20</option><option value="19">รุ่น 19</option><option value="ยังไม่ระบุ">ไม่ระบุรุ่น</option></select><Button type="submit" size="md">เพิ่มชื่อ</Button></form>}
     {error && <div className="mt-5"><Alert message={error} onDismiss={() => setError("")} /></div>}
     <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
-      {members.length === 0 ? <p className="p-8 text-center text-sm text-slate-400">ยังไม่มีรายชื่อสมาชิก</p> : members.map((member) => <div key={member.id} className="border-b border-white/10 bg-[#0a111f] p-4 last:border-0 sm:flex sm:items-center sm:justify-between"><div><p className="font-semibold text-white">{member.name}</p>{member.status === "leave" && member.leaveReason ? <p className="mt-1 text-sm text-amber-200">ลา: {member.leaveReason}</p> : <p className="mt-1 text-xs text-slate-500">{member.status ? STATUS[member.status].label : "ยังไม่เช็กชื่อ"}</p>}</div>{role === "admin" && <div className="mt-3 flex gap-2 sm:mt-0">{(["present", "absent", "leave"] as Status[]).map((status) => <button key={status} type="button" onClick={() => void updateStatus(member, status)} className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${member.status === status ? STATUS[status].active : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"}`}>{STATUS[status].label}</button>)}</div>}</div>)}
+      {members.length === 0 ? <p className="p-8 text-center text-sm text-slate-400">ยังไม่มีรายชื่อสมาชิก</p> : Object.entries(members.reduce((groups: Record<string, Member[]>, member) => { (groups[member.cohort] ??= []).push(member); return groups; }, {})).map(([memberCohort, cohortMembers]) => <div key={memberCohort}><div className="border-b border-white/10 bg-white/[0.03] px-4 py-2 text-xs font-semibold uppercase tracking-[.25em] text-reel">รุ่น {memberCohort}</div>{cohortMembers.map((member) => <div key={member.id} className="border-b border-white/10 bg-[#0a111f] p-4 last:border-0 sm:flex sm:items-center sm:justify-between"><div><p className="font-semibold text-white">{member.name}</p>{member.status === "leave" && member.leaveReason ? <p className="mt-1 text-sm text-amber-200">ลา: {member.leaveReason}</p> : <p className="mt-1 text-xs text-slate-500">{member.status ? STATUS[member.status].label : "ยังไม่เช็กชื่อ"}</p>}</div><div className="mt-3 flex gap-2 sm:mt-0">{(["present", "absent", "leave"] as Status[]).map((status) => <button key={status} type="button" onClick={() => void updateStatus(member, status)} className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${member.status === status ? STATUS[status].active : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"}`}>{STATUS[status].label}</button>)}</div></div>)}</div>)}
     </div>
   </div>;
 }
