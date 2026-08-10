@@ -21,21 +21,6 @@ function formatDateLabel(value: string) {
   return `${day}/${month}/${year}`;
 }
 
-function formatGoogleCalendarDate(value: string) {
-  const date = new Date(`${value}T00:00:00`);
-  const nextDay = new Date(date);
-  nextDay.setDate(date.getDate() + 1);
-  const pad = (num: number) => String(num).padStart(2, "0");
-  return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}/${nextDay.getFullYear()}${pad(nextDay.getMonth() + 1)}${pad(nextDay.getDate())}`;
-}
-
-function buildGoogleCalendarLink(entry: ScheduleEntry) {
-  const title = `${entry.topic} - ${entry.taskDescription}`;
-  const details = `หัวข้องาน: ${entry.topic}\nงาน: ${entry.taskDescription}${entry.note ? `\nหมายเหตุ: ${entry.note}` : ""}`;
-  const dates = formatGoogleCalendarDate(entry.date);
-  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&details=${encodeURIComponent(details)}&dates=${dates}`;
-}
-
 export default function WorkScheduleList() {
   const [scheduleEntries, setScheduleEntries] = useState<ScheduleEntry[]>([]);
   const [error, setError] = useState("");
@@ -169,14 +154,6 @@ export default function WorkScheduleList() {
                     <h3 className="mt-2 text-xl font-semibold text-white">{entry.taskDescription}</h3>
                   </div>
                   <div className="flex items-center gap-3">
-                    <a
-                      href={buildGoogleCalendarLink(entry)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="rounded-full border border-white/10 bg-reel/10 px-4 py-2 text-xs uppercase tracking-[0.25em] text-reel transition hover:bg-reel/20 hover:text-white"
-                    >
-                      เปิดใน Google Calendar
-                    </a>
                     <button
                       type="button"
                       onClick={() => setConfirmDeleteId(entry.id)}

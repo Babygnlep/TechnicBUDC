@@ -23,13 +23,6 @@ function formatGoogleCalendarDate(value: string) {
   return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}/${nextDay.getFullYear()}${pad(nextDay.getMonth() + 1)}${pad(nextDay.getDate())}`;
 }
 
-function buildGoogleCalendarLink(topic: string, task: string, date: string, note: string) {
-  const title = `${topic} - ${task}`;
-  const details = `หัวข้องาน: ${topic}\nงาน: ${task}${note ? `\nหมายเหตุ: ${note}` : ""}`;
-  const dates = formatGoogleCalendarDate(date);
-  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&details=${encodeURIComponent(details)}&dates=${dates}`;
-}
-
 export default function WorkScheduleForm({ onAdded }: WorkScheduleFormProps) {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("");
@@ -165,13 +158,13 @@ export default function WorkScheduleForm({ onAdded }: WorkScheduleFormProps) {
             disabled={!selectedTopic || !selectedDate || !taskDescription.trim()}
             onClick={() => {
               if (!selectedTopic || !selectedDate || !taskDescription.trim()) {
-                setFormError("กรุณากรอกหัวข้อ วันที่ และงานก่อนเปิด Google Calendar");
+                setFormError("กรุณากรอกหัวข้อ วันที่ และงานก่อนดูปฏิทิน");
                 return;
               }
-              window.open(buildGoogleCalendarLink(selectedTopic, taskDescription, selectedDate, note), "_blank");
+              document.getElementById("calendar")?.scrollIntoView({ behavior: "smooth" });
             }}
           >
-            เปิดใน Google Calendar
+            ดูปฏิทินในเว็บ
           </Button>
         </div>
       </form>

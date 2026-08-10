@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { addScheduleEntry, getScheduleEntries, removeScheduleEntry, removeScheduleSigner, signScheduleEntry } from "@/lib/schedule-store";
-import { createGoogleCalendarEvent, isGoogleCalendarConfigured } from "@/lib/google-calendar";
 
 
 export async function GET() {
@@ -45,27 +44,7 @@ export async function POST(req: Request) {
     }
 
     const entry = await addScheduleEntry(topic, date, taskDescription, note);
-
-    const disableGoogle = String(process.env.DISABLE_GOOGLE_CALENDAR || "").toLowerCase() === "true";
-    const googleConfigured = isGoogleCalendarConfigured();
-    const googleSyncSkipped = disableGoogle || !googleConfigured;
-
-    if (!googleSyncSkipped) {
-      try {
-        await createGoogleCalendarEvent(topic, date, taskDescription, note);
-      } catch (error) {
-        await removeScheduleEntry(entry.id).catch(() => undefined);
-        return NextResponse.json(
-          {
-            success: false,
-            message: `ไม่สามารถส่งข้อมูลไป Google Calendar: ${String(error)}`,
-          },
-          { status: 500 }
-        );
-      }
-    }
-
-    return NextResponse.json({ success: true, entry, googleSyncSkipped });
+    return NextResponse.json({ success: true, entry });
   } catch (error) {
     return NextResponse.json(
       { success: false, message: String(error) },
