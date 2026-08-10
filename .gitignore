@@ -30,3 +30,4 @@ public/show-reel.mp4
 google-service-account.json
 .vercel
 .env*
+!.env.local.example

@@ -119,13 +119,13 @@ export default function CalendarView({ entries }: CalendarViewProps) {
   };
 
   return (
-    <div id="calendar" className="rounded-[1.6rem] border border-white/10 bg-[#0a111f]/95 p-6 shadow-[0_18px_60px_-30px_rgba(0,0,0,0.55)]">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div id="calendar" className="rounded-[1.6rem] border border-white/10 bg-[#0a111f]/95 p-4 shadow-[0_18px_60px_-30px_rgba(0,0,0,0.55)] sm:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.35em] text-slate-400">ปฏิทินงาน</p>
           <h3 className="mt-2 text-2xl font-display text-white">ดูวันลงงานในเดือนนี้</h3>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2">
+        <div className="flex w-full items-center justify-between gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 sm:w-auto sm:justify-start">
           <button
             type="button"
             onClick={goToPreviousMonth}
@@ -133,7 +133,7 @@ export default function CalendarView({ entries }: CalendarViewProps) {
           >
             ←
           </button>
-          <span className="min-w-[10rem] text-center text-sm font-semibold text-slate-100">{monthLabel}</span>
+          <span className="min-w-0 flex-1 text-center text-sm font-semibold text-slate-100 sm:min-w-[10rem] sm:flex-none">{monthLabel}</span>
           <button
             type="button"
             onClick={goToNextMonth}
@@ -144,21 +144,24 @@ export default function CalendarView({ entries }: CalendarViewProps) {
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-7 gap-2 text-center text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-400">
+      <div className="mt-6 grid grid-cols-7 gap-1 text-center text-[10px] font-semibold text-slate-400 sm:gap-2 sm:text-[11px] sm:uppercase sm:tracking-[0.25em]">
         {[
-          "Sun",
-          "Mon",
-          "Tue",
-          "Wed",
-          "Thu",
-          "Fri",
-          "Sat",
+          { short: "อา", full: "Sun" },
+          { short: "จ", full: "Mon" },
+          { short: "อ", full: "Tue" },
+          { short: "พ", full: "Wed" },
+          { short: "พฤ", full: "Thu" },
+          { short: "ศ", full: "Fri" },
+          { short: "ส", full: "Sat" },
         ].map((day) => (
-          <div key={day}>{day}</div>
+          <div key={day.full}>
+            <span className="sm:hidden">{day.short}</span>
+            <span className="hidden sm:inline">{day.full}</span>
+          </div>
         ))}
       </div>
 
-      <div className="mt-3 grid grid-cols-7 gap-2">
+      <div className="mt-3 grid grid-cols-7 gap-1 sm:gap-2">
         {visibleDays.map(({ date, inCurrentMonth }) => {
           const dateKey = formatDateValue(date);
           const dayEntries = entries.filter((entry) => entry.date === dateKey);
@@ -169,22 +172,24 @@ export default function CalendarView({ entries }: CalendarViewProps) {
               key={dateKey}
               type="button"
               onClick={() => setSelectedDate(dateKey)}
-              className={`flex min-h-[84px] flex-col rounded-2xl border p-2 text-left transition ${
+              aria-label={`${formatDateLabel(dateKey)}${dayEntries.length ? ` มี ${dayEntries.length} รายการ` : ""}`}
+              className={`flex min-h-[52px] flex-col rounded-xl border p-1.5 text-left transition sm:min-h-[84px] sm:rounded-2xl sm:p-2 ${
                 inCurrentMonth ? "border-white/10 bg-[#0f1725] text-slate-100" : "border-white/5 bg-slate-950/70 text-slate-500"
               } ${isSelected ? "ring-2 ring-reel" : "hover:border-reel/50"}`}
             >
-              <span className="text-sm font-semibold">{date.getDate()}</span>
+              <span className="text-xs font-semibold sm:text-sm">{date.getDate()}</span>
               {dayEntries.length > 0 ? (
-                <div className="mt-2 flex flex-wrap gap-1">
+                <div className="mt-1 flex flex-wrap gap-1 sm:mt-2">
                   {dayEntries.slice(0, 3).map((entry) => {
                     const style = getTopicStyle(entry.topic);
                     return (
                       <span
                         key={entry.id}
-                        className={`inline-flex w-fit items-center gap-1 rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${style.badge}`}
+                        title={entry.topic}
+                        className={`inline-flex w-fit items-center gap-1 rounded-full border px-1.5 py-1 text-[10px] font-semibold sm:px-2 sm:tracking-[0.2em] ${style.badge}`}
                       >
                         <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
-                        {entry.topic}
+                        <span className="hidden sm:inline">{entry.topic}</span>
                       </span>
                     );
                   })}

@@ -1,8 +1,35 @@
 import { NextResponse } from "next/server";
 import { addScheduleEntry, getScheduleEntries, removeScheduleEntry, removeScheduleSigner, signScheduleEntry } from "@/lib/schedule-store";
+import { getScheduleRoleFromSession, getScheduleSessionFromRequest, type ScheduleRole } from "@/lib/schedule-auth";
+
+function getScheduleRole(request: Request): ScheduleRole | null {
+  return getScheduleRoleFromSession(getScheduleSessionFromRequest(request));
+}
+
+function requireScheduleAuthentication(request: Request, requiredRole?: "admin") {
+  const role = getScheduleRole(request);
+  if (!role) {
+    return NextResponse.json(
+      { success: false, message: "กรุณาเข้าสู่ระบบก่อนใช้งาน" },
+      { status: 401 }
+    );
+  }
+
+  if (requiredRole === "admin" && role !== "admin") {
+    return NextResponse.json(
+      { success: false, message: "เฉพาะผู้ดูแลระบบเท่านั้นที่ทำรายการนี้ได้" },
+      { status: 403 }
+    );
+  }
+
+  return null;
+}
 
 
-export async function GET() {
+export async function GET(req: Request) {
+  const unauthorized = requireScheduleAuthentication(req);
+  if (unauthorized) return unauthorized;
+
   try {
     const entries = await getScheduleEntries();
     return NextResponse.json({ success: true, entries });
@@ -15,6 +42,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const unauthorized = requireScheduleAuthentication(req, "admin");
+  if (unauthorized) return unauthorized;
+
   try {
     const body = await req.json();
     const topic = typeof body?.topic === "string" ? body.topic : "";
@@ -54,6 +84,10 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request) {
+  const unauthorized = requireScheduleAuthentication(req);
+  if (unauthorized) return unauthorized;
+  const requestRole = getScheduleRole(req);
+
   try {
     const body = await req.json();
     const id = typeof body?.id === "string" ? body.id : "";
@@ -67,6 +101,9 @@ export async function PATCH(req: Request) {
     }
 
     if (action === "removeSigner") {
+      const unauthorized = requireScheduleAuthentication(req, "admin");
+      if (unauthorized) return unauthorized;
+
       const signedAt = typeof body?.signedAt === "string" ? body.signedAt : "";
       if (!signedAt) {
         return NextResponse.json(
@@ -79,8 +116,9 @@ export async function PATCH(req: Request) {
     }
 
     const name = typeof body?.name === "string" ? body.name : "";
-    const role = typeof body?.role === "string" ? body.role : "";
+    const requestedSignerRole = typeof body?.role === "string" ? body.role : "";
     const team = typeof body?.team === "string" ? body.team : "";
+    const signerRole = requestedSignerRole;
 
     if (!name.trim()) {
       return NextResponse.json(
@@ -89,14 +127,14 @@ export async function PATCH(req: Request) {
       );
     }
 
-    if (!role.trim()) {
+    if (!signerRole.trim()) {
       return NextResponse.json(
         { success: false, message: "กรุณาระบุหน้าที่หรือบทบาท" },
         { status: 400 }
       );
     }
 
-    const entry = await signScheduleEntry(id, name, role, team);
+    const entry = await signScheduleEntry(id, name, signerRole, requestRole === "admin" ? team : undefined);
     return NextResponse.json({ success: true, entry });
   } catch (error) {
     return NextResponse.json(
@@ -107,6 +145,9 @@ export async function PATCH(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const unauthorized = requireScheduleAuthentication(req, "admin");
+  if (unauthorized) return unauthorized;
+
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
