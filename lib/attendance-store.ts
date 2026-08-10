@@ -34,11 +34,15 @@ async function initAttendanceTables() {
       date TEXT NOT NULL,
       status TEXT NOT NULL CHECK (status IN ('present', 'absent', 'leave')),
       leave_reason TEXT NOT NULL DEFAULT '',
+      checked_by TEXT NOT NULL DEFAULT '',
+      checked_cohort TEXT NOT NULL DEFAULT '',
       updated_at TEXT NOT NULL,
       PRIMARY KEY (member_id, date)
     );
   `);
   await database.query(`ALTER TABLE attendance_members ADD COLUMN IF NOT EXISTS cohort TEXT NOT NULL DEFAULT 'ยังไม่ระบุ'`);
+  await database.query(`ALTER TABLE attendance_records ADD COLUMN IF NOT EXISTS checked_by TEXT NOT NULL DEFAULT ''`);
+  await database.query(`ALTER TABLE attendance_records ADD COLUMN IF NOT EXISTS checked_cohort TEXT NOT NULL DEFAULT ''`);
 }
 
 export async function getAttendance(date: string): Promise<AttendanceMember[]> {
@@ -70,12 +74,18 @@ export async function seedPdfRoster() {
   }
 }
 
-export async function setAttendance(date: string, memberId: string, status: AttendanceStatus, leaveReason: string) {
+export async function setAttendance(date: string, memberId: string, status: AttendanceStatus, leaveReason: string, checkedBy: string, checkedCohort: string) {
   const database = requireDatabase();
   await initAttendanceTables();
   await database.query(`
-    INSERT INTO attendance_records (member_id, date, status, leave_reason, updated_at)
-    VALUES ($1, $2, $3, $4, $5)
-    ON CONFLICT (member_id, date) DO UPDATE SET status = EXCLUDED.status, leave_reason = EXCLUDED.leave_reason, updated_at = EXCLUDED.updated_at
-  `, [memberId, date, status, status === "leave" ? leaveReason.trim() : "", new Date().toISOString()]);
+    INSERT INTO attendance_records (member_id, date, status, leave_reason, checked_by, checked_cohort, updated_at)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    ON CONFLICT (member_id, date) DO UPDATE SET status = EXCLUDED.status, leave_reason = EXCLUDED.leave_reason, checked_by = EXCLUDED.checked_by, checked_cohort = EXCLUDED.checked_cohort, updated_at = EXCLUDED.updated_at
+  `, [memberId, date, status, status === "leave" ? leaveReason.trim() : "", checkedBy.trim(), checkedCohort.trim(), new Date().toISOString()]);
+}
+
+export async function clearAttendance(date: string, memberId: string) {
+  const database = requireDatabase();
+  await initAttendanceTables();
+  await database.query(`DELETE FROM attendance_records WHERE member_id = $1 AND date = $2`, [memberId, date]);
 }
