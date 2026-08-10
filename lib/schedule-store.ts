@@ -4,6 +4,7 @@ import {
   removeScheduleEntryFromDb,
   removeScheduleSignerFromDb,
   signScheduleEntryInDb,
+  updateScheduleSignerRoleInDb,
 } from "./postgres";
 
 export interface ScheduleEntry {
@@ -61,6 +62,14 @@ export async function signScheduleEntry(
 export async function removeScheduleSigner(id: string, signedAt: string): Promise<ScheduleEntry> {
   requireDatabaseConnection();
   await removeScheduleSignerFromDb(id, signedAt);
+  const entry = (await getScheduleEntries()).find((scheduleEntry) => scheduleEntry.id === id);
+  if (!entry) throw new Error("Entry not found");
+  return entry;
+}
+
+export async function updateScheduleSignerRole(id: string, signedAt: string, role: string): Promise<ScheduleEntry> {
+  requireDatabaseConnection();
+  await updateScheduleSignerRoleInDb(id, signedAt, role);
   const entry = (await getScheduleEntries()).find((scheduleEntry) => scheduleEntry.id === id);
   if (!entry) throw new Error("Entry not found");
   return entry;

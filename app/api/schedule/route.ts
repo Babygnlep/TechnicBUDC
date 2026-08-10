@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { addScheduleEntry, getScheduleEntries, removeScheduleEntry, removeScheduleSigner, signScheduleEntry } from "@/lib/schedule-store";
+import { addScheduleEntry, getScheduleEntries, removeScheduleEntry, removeScheduleSigner, signScheduleEntry, updateScheduleSignerRole } from "@/lib/schedule-store";
 import { getScheduleRoleFromSession, getScheduleSessionFromRequest, type ScheduleRole } from "@/lib/schedule-auth";
 
 function getScheduleRole(request: Request): ScheduleRole | null {
@@ -112,6 +112,22 @@ export async function PATCH(req: Request) {
         );
       }
       const entry = await removeScheduleSigner(id, signedAt);
+      return NextResponse.json({ success: true, entry });
+    }
+
+    if (action === "updateSignerRole") {
+      const unauthorized = requireScheduleAuthentication(req, "admin");
+      if (unauthorized) return unauthorized;
+
+      const signedAt = typeof body?.signedAt === "string" ? body.signedAt : "";
+      const signerRole = typeof body?.role === "string" ? body.role.trim() : "";
+      if (!signedAt || !signerRole) {
+        return NextResponse.json(
+          { success: false, message: "กรุณาระบุตำแหน่ง" },
+          { status: 400 }
+        );
+      }
+      const entry = await updateScheduleSignerRole(id, signedAt, signerRole);
       return NextResponse.json({ success: true, entry });
     }
 

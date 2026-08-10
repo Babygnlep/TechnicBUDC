@@ -151,6 +151,18 @@ export async function removeScheduleSignerFromDb(entryId: string, signedAt: stri
   await pool.query(`DELETE FROM schedule_signers WHERE entry_id = $1 AND signed_at = $2`, [entryId, signedAt]);
 }
 
+export async function updateScheduleSignerRoleInDb(entryId: string, signedAt: string, role: string) {
+  if (!pool) {
+    throw new Error("POSTGRES_URL or DATABASE_URL is not configured");
+  }
+
+  await initScheduleTables();
+  await pool.query(
+    `UPDATE schedule_signers SET role = $3 WHERE entry_id = $1 AND signed_at = $2`,
+    [entryId, signedAt, role.trim()]
+  );
+}
+
 export async function removeScheduleEntryFromDb(id: string) {
   if (!pool) {
     throw new Error("POSTGRES_URL or DATABASE_URL is not configured");

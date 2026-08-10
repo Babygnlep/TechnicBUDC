@@ -40,6 +40,7 @@ export default function WorkSchedule() {
   const [note, setNote] = useState("");
   const [scheduleEntries, setScheduleEntries] = useState<ScheduleEntry[]>([]);
   const [pendingSigners, setPendingSigners] = useState<Record<string, { name: string; role: string }>>({});
+  const [editingSignerRoles, setEditingSignerRoles] = useState<Record<string, string>>({});
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [role, setRole] = useState<ScheduleRole | null>(null);
 
@@ -172,6 +173,30 @@ export default function WorkSchedule() {
   const knownSignerNames = Array.from(
     new Set(scheduleEntries.flatMap((entry) => (entry.signers ?? []).map((signer) => signer.name.trim())).filter(Boolean))
   );
+
+  if (!isAdmin) {
+    return (
+      <section id="schedule" className="bg-canvas px-3 py-20 sm:px-4 sm:py-24 md:px-6 md:py-32">
+        <div className="mx-auto w-full max-w-5xl rounded-[2.2rem] border border-white/10 bg-[#080d18]/95 p-4 shadow-[0_30px_120px_-45px_rgba(0,0,0,0.65)] backdrop-blur-xl sm:p-6 lg:p-10">
+          <div className="mb-8 flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.35em] text-slate-400">ตารางงานเทคนิค</p>
+              <h2 className="mt-2 font-display text-3xl text-white sm:text-4xl">วันและเวลาที่งานพร้อม</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-300">เลือกวันที่ในปฏิทินเพื่อดูรายละเอียดงานที่พร้อมลงงาน</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void handleLogout()}
+              className="shrink-0 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/10"
+            >
+              ออกจากระบบ
+            </button>
+          </div>
+          <CalendarView entries={scheduleEntries} />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="schedule" className="bg-canvas px-3 py-20 sm:px-4 sm:py-24 md:px-6 md:py-32">
@@ -319,34 +344,71 @@ export default function WorkSchedule() {
                                   <p className="text-xs uppercase tracking-[0.25em] text-slate-400">{signerRole}</p>
                                   <div className="mt-2 space-y-2">
                                     {signers.map((signer) => (
-                                      <div key={signer.signedAt} className="flex items-center justify-between gap-3 rounded-xl bg-[#0f1725] px-3 py-2">
+                                      <div key={signer.signedAt} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-[#0f1725] px-3 py-2">
                                         <p className="text-sm text-slate-300">{signer.name}</p>
-                                        {isAdmin ? <button
-                                          type="button"
-                                          onClick={async () => {
-                                            try {
-                                              const response = await fetch("/api/schedule", {
-                                                method: "PATCH",
-                                                headers: { "Content-Type": "application/json" },
-                                                body: JSON.stringify({
-                                                  id: entry.id,
-                                                  action: "removeSigner",
-                                                  signedAt: signer.signedAt,
-                                                }),
-                                              });
-                                              const result = await response.json();
-                                              if (!response.ok || !result?.success) {
-                                                throw new Error(result?.message || "ไม่สามารถลบชื่อได้");
-                                              }
-                                              await fetchScheduleEntries();
-                                            } catch (error) {
-                                              setLoginError(error instanceof Error ? error.message : "ไม่สามารถลบชื่อได้");
-                                            }
-                                          }}
-                                          className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-200 transition hover:bg-red-500 hover:text-white"
-                                        >
-                                          ลบ
-                                        </button> : null}
+                                        {editingSignerRoles[`${entry.id}:${signer.signedAt}`] !== undefined ? (
+                                          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+                                            <input
+                                              type="text"
+                                              value={editingSignerRoles[`${entry.id}:${signer.signedAt}`]}
+                                              onChange={(event) => setEditingSignerRoles((prev) => ({ ...prev, [`${entry.id}:${signer.signedAt}`]: event.target.value }))}
+                                              aria-label={`ตำแหน่งของ ${signer.name}`}
+                                              className="min-w-0 flex-1 rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white sm:w-40"
+                                            />
+                                            <button
+                                              type="button"
+                                              onClick={async () => {
+                                                const key = `${entry.id}:${signer.signedAt}`;
+                                                const updatedRole = editingSignerRoles[key]?.trim();
+                                                if (!updatedRole) {
+                                                  setLoginError("กรุณาระบุตำแหน่ง");
+                                                  return;
+                                                }
+                                                try {
+                                                  const response = await fetch("/api/schedule", {
+                                                    method: "PATCH",
+                                                    headers: { "Content-Type": "application/json" },
+                                                    body: JSON.stringify({ id: entry.id, action: "updateSignerRole", signedAt: signer.signedAt, role: updatedRole }),
+                                                  });
+                                                  const result = await response.json();
+                                                  if (!response.ok || !result?.success) throw new Error(result?.message || "ไม่สามารถแก้ไขตำแหน่งได้");
+                                                  setEditingSignerRoles((prev) => {
+                                                    const next = { ...prev };
+                                                    delete next[key];
+                                                    return next;
+                                                  });
+                                                  await fetchScheduleEntries();
+                                                } catch (error) {
+                                                  setLoginError(error instanceof Error ? error.message : "ไม่สามารถแก้ไขตำแหน่งได้");
+                                                }
+                                              }}
+                                              className="rounded-full bg-reel px-3 py-2 text-xs font-semibold text-[#08141d]"
+                                            >บันทึก</button>
+                                            <button type="button" onClick={() => setEditingSignerRoles((prev) => { const next = { ...prev }; delete next[`${entry.id}:${signer.signedAt}`]; return next; })} className="text-xs text-slate-300">ยกเลิก</button>
+                                          </div>
+                                        ) : (
+                                          <div className="flex items-center gap-2">
+                                            <button type="button" onClick={() => setEditingSignerRoles((prev) => ({ ...prev, [`${entry.id}:${signer.signedAt}`]: signerRole }))} className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-200 transition hover:bg-white/10">แก้ไขตำแหน่ง</button>
+                                            <button
+                                              type="button"
+                                              onClick={async () => {
+                                                try {
+                                                  const response = await fetch("/api/schedule", {
+                                                    method: "PATCH",
+                                                    headers: { "Content-Type": "application/json" },
+                                                    body: JSON.stringify({ id: entry.id, action: "removeSigner", signedAt: signer.signedAt }),
+                                                  });
+                                                  const result = await response.json();
+                                                  if (!response.ok || !result?.success) throw new Error(result?.message || "ไม่สามารถลบชื่อได้");
+                                                  await fetchScheduleEntries();
+                                                } catch (error) {
+                                                  setLoginError(error instanceof Error ? error.message : "ไม่สามารถลบชื่อได้");
+                                                }
+                                              }}
+                                              className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-200 transition hover:bg-red-500 hover:text-white"
+                                            >ลบ</button>
+                                          </div>
+                                        )}
                                       </div>
                                     ))}
                                   </div>
