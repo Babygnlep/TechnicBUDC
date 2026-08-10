@@ -8,6 +8,7 @@ const NAV_LINKS = [
   { label: "เกี่ยวกับเรา", href: "/#about" },
   { label: "สมัครงาน", href: "/#apply" },
   { label: "ลงงานวันที่", href: "/schedule" },
+  { label: "เช็กชื่อ", href: "/attendance" },
 ];
 
 /** Sticky black navbar. Collapses into a hamburger menu on small screens. */
