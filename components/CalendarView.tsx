@@ -15,6 +15,28 @@ interface CalendarViewProps {
   entries: ScheduleEntry[];
 }
 
+const TOPIC_COLORS: Record<string, { badge: string; dot: string; border: string }> = {
+  LDC: {
+    badge: "border-cyan-400/30 bg-cyan-500/10 text-cyan-200",
+    dot: "bg-cyan-400",
+    border: "border-cyan-400/30",
+  },
+  CAMERASTORE: {
+    badge: "border-fuchsia-400/30 bg-fuchsia-500/10 text-fuchsia-200",
+    dot: "bg-fuchsia-400",
+    border: "border-fuchsia-400/30",
+  },
+  DEFAULT: {
+    badge: "border-reel/30 bg-reel/10 text-reel",
+    dot: "bg-reel",
+    border: "border-white/10",
+  },
+};
+
+function getTopicStyle(topic: string) {
+  return TOPIC_COLORS[topic] ?? TOPIC_COLORS.DEFAULT;
+}
+
 function formatDateValue(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -153,9 +175,20 @@ export default function CalendarView({ entries }: CalendarViewProps) {
             >
               <span className="text-sm font-semibold">{date.getDate()}</span>
               {dayEntries.length > 0 ? (
-                <span className="mt-2 inline-flex w-fit rounded-full bg-reel/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-reel">
-                  {dayEntries.length} งาน
-                </span>
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {dayEntries.slice(0, 3).map((entry) => {
+                    const style = getTopicStyle(entry.topic);
+                    return (
+                      <span
+                        key={entry.id}
+                        className={`inline-flex w-fit items-center gap-1 rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${style.badge}`}
+                      >
+                        <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
+                        {entry.topic}
+                      </span>
+                    );
+                  })}
+                </div>
               ) : null}
             </button>
           );
@@ -177,17 +210,20 @@ export default function CalendarView({ entries }: CalendarViewProps) {
           <p className="mt-4 text-sm text-slate-300">ยังไม่มีงานในวันที่นี้</p>
         ) : (
           <div className="mt-4 space-y-3">
-            {selectedEntries.map((entry) => (
-              <div key={entry.id} className="rounded-2xl border border-white/10 bg-slate-950/70 p-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-reel/30 bg-reel/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.25em] text-reel">
-                    {entry.topic}
-                  </span>
-                  <span className="text-sm text-slate-300">{entry.taskDescription}</span>
+            {selectedEntries.map((entry) => {
+              const style = getTopicStyle(entry.topic);
+              return (
+                <div key={entry.id} className={`rounded-2xl border bg-slate-950/70 p-3 ${style.border}`}>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.25em] ${style.badge}`}>
+                      {entry.topic}
+                    </span>
+                    <span className="text-sm text-slate-300">{entry.taskDescription}</span>
+                  </div>
+                  {entry.note ? <p className="mt-2 text-sm text-slate-400">{entry.note}</p> : null}
                 </div>
-                {entry.note ? <p className="mt-2 text-sm text-slate-400">{entry.note}</p> : null}
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
